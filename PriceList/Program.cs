@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PriceList.DataAccess;
 using PriceList.BusinessLogic.Handlers;
 using Microsoft.Extensions.Logging;
+using PriceList.BusinessLogic;
 
 namespace PriceList;
 
