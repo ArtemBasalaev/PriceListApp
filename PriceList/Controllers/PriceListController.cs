@@ -15,6 +15,12 @@ public class PriceListController : ControllerBase
         return getPriceListsHandler.HandleAsync();
     }
 
+    [HttpGet("{priceListId}")]
+    public Task<PriceListData> GetPriceList([FromServices] GetPriceListDataHandler getPriceListDataHandler, int priceListId)
+    {
+        return getPriceListDataHandler.HandleAsync(priceListId);
+    }
+
     [HttpPost]
     public Task<BaseResponse> SavePriceList([FromServices] SavePriceListHandler savePriceListHandler, CreatePriceListRequest request)
     {

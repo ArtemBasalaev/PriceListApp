@@ -18,12 +18,20 @@
 
         data() {
             return {
-
-            };
+                priceList: []
+            }
         },
 
+        created() {
+            this.loadData();
+        },
+        
         methods: {
-            
+            loadData() {
+                this.$store.dispatch("getPriceList", this.id).then(priceList => {
+                    this.priceList = priceList
+                });
+            },
         }
     };
 </script>

@@ -39,7 +39,11 @@ const store = new Vuex.Store({
 
         getPriceLists({ state }) {
             return state.priceListService.getPriceLists();
-        }
+        },
+
+        getPriceList({ state }, id) {
+            return state.priceListService.getPriceList(id);
+        },
     },
 
     modules: {
@@ -47,6 +51,6 @@ const store = new Vuex.Store({
     }
 });
 
-SubscribeSignalREvents(SignalR, store);
+//SubscribeSignalREvents(SignalR, store);
 
 export default store;

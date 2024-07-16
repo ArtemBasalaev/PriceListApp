@@ -13,6 +13,16 @@ public class PriceListDbContext : DbContext
 
     public DbSet<PriceListColumn> PriceListColumns { get; set; }
 
+    public DbSet<PriceListData> PriceListData { get; set; }
+
+    public DbSet<Product> Products { get; set; }
+
+    public DbSet<TextColumnData>TextColumnsData { get; set; }
+
+    public DbSet<IntegerColumnData> IntegerColumnData { get; set; }
+
+    public DbSet<DecimalColumnData> DecimalColumnData { get; set; }
+
     public PriceListDbContext(DbContextOptions<PriceListDbContext> options) : base(options)
     {
     }
