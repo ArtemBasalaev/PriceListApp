@@ -140,11 +140,13 @@
                 }
 
                 this.$store.dispatch("createPriceList", createPriceListRequest).then(_ => {
+                    this.$store.state.connection.invoke("NotifyPriceListCreated", this.priceListName, "admin")
+                    
                     this.priceListName = "";
                     this.priceListColumns = [];
                     this.$refs.observer.reset();
 
-                    this.$store.commit("toast/success", "Прайс-лист успешно сохранен");
+                    //this.$store.commit("toast/success", "Прайс-лист успешно сохранен");
                 });
             }
         }

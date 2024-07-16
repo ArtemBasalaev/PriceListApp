@@ -10,7 +10,8 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
     state: {
         priceListService: new PriceListService(),
-        priceListsColumns: []
+        priceListsColumns: [],
+        connection: SignalR.connection,
     },
 
     getters: {
@@ -46,6 +47,6 @@ const store = new Vuex.Store({
     }
 });
 
-//SubscribeSignalREvents(SignalR, store);
+SubscribeSignalREvents(SignalR, store);
 
 export default store;

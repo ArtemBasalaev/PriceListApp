@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PriceList.DataAccess;
-using PriceList.BusinessLogic.Handlers;
-using Microsoft.Extensions.Logging;
 using PriceList.BusinessLogic;
+using PriceList.Hub;
 
 namespace PriceList;
 
@@ -60,7 +59,15 @@ public class Program
 
         app.UseAuthorization();
 
+        // JSON обработчик исключений для API
+        app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
+        {
+            appBuilder.UseMiddleware<ErrorHandlingMiddleware>();
+        });
+
         app.MapControllers();
+        app.MapHub<PriceListHub>("/hub");
+
         app.MapFallbackToFile("index.html");
 
         //app.MapControllerRoute(

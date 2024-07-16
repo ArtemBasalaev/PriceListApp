@@ -17,53 +17,32 @@ public class DbInitializer : IDbInitializer
     {
         await _dbContext.Database.MigrateAsync();
 
-        if (_dbContext.DataTypes.Any() && _dbContext.DataTypes.Any())
+        if (_dbContext.DataTypes.Any())
         {
             return;
         }
 
-        if (!_dbContext.DataTypes.Any())
+        var dataTypes = new List<DataType>
         {
-            var dataTypes = new List<DataType>
+            new()
             {
-                new()
-                {
-                    TypeName = "Однострочный текст"
-                },
-                new()
-                {
-                    TypeName = "Многострочный текст"
-                },
-                new()
-                {
-                    TypeName = "Целое число"
-                },
-                new()
-                {
-                    TypeName = "Десятичное число"
-                }
-            };
-
-            _dbContext.DataTypes.AddRange(dataTypes);
-        }
-
-        if (!_dbContext.Columns.Any())
-        {
-            var columnNames = new List<Column>
+                TypeName = "Однострочный текст"
+            },
+            new()
             {
-                new()
-                {
-                    Name = "Название"
-                },
-                new()
-                {
-                    Name = "Код"
-                }
-            };
+                TypeName = "Многострочный текст"
+            },
+            new()
+            {
+                TypeName = "Целое число"
+            },
+            new()
+            {
+                TypeName = "Десятичное число"
+            }
+        };
 
-            _dbContext.Columns.AddRange(columnNames);
-        }
-
+        _dbContext.DataTypes.AddRange(dataTypes);
         await _dbContext.SaveChangesAsync();
     }
 }
