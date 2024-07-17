@@ -1,4 +1,4 @@
-﻿export default class PagesNavigation {
+﻿export default class Utils {
     static goBack() {
         if (window.history.length > 1) {
             this.$router.back();

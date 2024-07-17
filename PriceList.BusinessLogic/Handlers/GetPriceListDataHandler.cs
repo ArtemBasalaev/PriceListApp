@@ -44,6 +44,20 @@ public class GetPriceListDataHandler : IHandler
             .Where(c => c.PriceListColumn.PriceListId == priceListId)
             .ToListAsync();
 
+        if (priceListData.Count == 0)
+        {
+            return new PriceListData
+            {
+                PriceList = new PriceListDto
+                {
+                    Id = priceList.Id,
+                    Name = priceList.Name,
+                    CreationDate = priceList.CreationDate
+                },
+                Columns = priceListColumns
+            };
+        }
+
         var priceListProductsIds = priceListData
             .Select(c => c.ProductId)
             .Distinct()

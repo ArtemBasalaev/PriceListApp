@@ -30,6 +30,8 @@
 </template>
 
 <script>
+    import Utils from "@/common/utils";
+
     export default {
         data() {
             return {
@@ -78,21 +80,7 @@
                 });
             },
 
-            formatDate(dateTime) {
-                if (dateTime === null) {
-                    return "-";
-                }
-
-                const date = new Date(Date.parse(dateTime));
-
-                const options = {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric"
-                };
-
-                return date.toLocaleString("ru", options);
-            },
+            formatDate: Utils.formatDate,
 
             searchPriceList(value, search, _) {
                 return value != null &&
