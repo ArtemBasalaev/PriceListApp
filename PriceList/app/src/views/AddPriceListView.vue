@@ -120,7 +120,7 @@
             },
 
             savePricetList() {
-                const createPriceListRequest = {
+                const request = {
                     name: this.priceListName,
                     columns: this.priceListColumns.map(c => {
                         if (typeof c.name === "string") {
@@ -137,7 +137,7 @@
                     })
                 }
 
-                this.$store.dispatch("createPriceList", createPriceListRequest).then(_ => {
+                this.$store.dispatch("addPriceList", request).then(_ => {
                     //this.$store.state.connection.invoke("NotifyPriceListCreated", this.priceListName, "admin")
                     
                     this.priceListName = "";

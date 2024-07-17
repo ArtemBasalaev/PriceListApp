@@ -1,6 +1,6 @@
 ﻿namespace PriceList.Contracts;
 
-public class PriceListData
+public class PriceListDataDto
 {
     public PriceListDto PriceList { get; set; }
     

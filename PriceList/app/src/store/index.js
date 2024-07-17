@@ -33,8 +33,16 @@ const store = new Vuex.Store({
             return state.priceListService.getColumnTypes();
         },
 
-        createPriceList({ state }, createPriceListRequest) {
-            return state.priceListService.createPriceList(createPriceListRequest);
+        addPriceList({ state }, request) {
+            return state.priceListService.addPriceList(request);
+        },
+
+        addDataInPriceList({ state }, request) {
+            return state.priceListService.addDataInPriceList(request);
+        },
+
+        addNewProduct({ state }, request) {
+            return state.priceListService.addNewProduct(request);
         },
 
         getPriceLists({ state }) {

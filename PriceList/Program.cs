@@ -70,10 +70,6 @@ public class Program
 
         app.MapFallbackToFile("index.html");
 
-        //app.MapControllerRoute(
-        //    name: "default",
-        //    pattern: "{controller=Home}/{action=Index}/{id?}");
-
         // Init database
         using (var scope = app.Services.CreateScope())
         {

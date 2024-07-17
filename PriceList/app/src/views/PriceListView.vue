@@ -7,7 +7,7 @@
         <v-row>
             <v-col cols="12" sm="10" class="ml-2">
                 <v-data-table :headers="headers"
-                              :items="priceList"
+                              :items="priceListData"
                               :items-per-page="10"
                               class="elevation-1"
                               :search="search"
@@ -50,13 +50,13 @@
                     <v-card-text>
                         <v-container>
                             <validation-observer ref="observer" v-slot="{ handleSubmit }">
-                                <form @submit.prevent="handleSubmit(savePricetList)">
+                                <form @submit.prevent="handleSubmit(saveNewProduct)">
                                     <v-row>
                                         <v-col cols="12">
                                             <validation-provider tag="div"
                                                                  v-slot="{ errors }"
                                                                  rules="required">
-                                                <v-text-field v-model="product.name"
+                                                <v-text-field v-model="newProduct.name"
                                                               label="Название товара*"
                                                               :error-messages="errors">
                                                 </v-text-field>
@@ -67,7 +67,7 @@
                                             <validation-provider tag="div"
                                                                  v-slot="{ errors }"
                                                                  rules="required">
-                                                <v-text-field v-model="product.code"
+                                                <v-text-field v-model="newProduct.code"
                                                               label="Код товара"
                                                               :error-messages="errors">
                                                 </v-text-field>
@@ -85,46 +85,54 @@
                                                 <validation-provider tag="div"
                                                                      v-slot="{ errors }"
                                                                      rules="required">
-                                                    <v-text-field v-if="column.columnType.id !== 2"
-                                                                  v-model="productValue[column.columnName.id]"
+                                                    <v-text-field v-if="column.columnType.id === 1"
+                                                                  v-model="newProduct.data[column.priceListColumnId]"
                                                                   label="Значение"
                                                                   :placeholder="column.columnType.name"
                                                                   :error-messages="errors">
                                                     </v-text-field>
-                                                    <v-textarea v-else
+                                                    <v-textarea v-else-if="2"
                                                                 auto-grow
                                                                 outlined
                                                                 rows="3"
-                                                                v-model="productValue[column.columnName.id]"
+                                                                v-model="newProduct.data[column.priceListColumnId]"
                                                                 row-height="30"></v-textarea>
+                                                    <v-text-field v-else
+                                                                  v-model="newProduct.data[column.priceListColumnId]"
+                                                                  label="Значение"
+                                                                  type="number"
+                                                                  :placeholder="column.columnType.name"
+                                                                  :error-messages="errors">
+                                                    </v-text-field>
                                                 </validation-provider>
                                             </v-col>
                                         </v-row>
                                     </template>
+
+                                    <v-card-actions>
+                                        <v-spacer></v-spacer>
+                                        <v-col>
+                                            <v-btn depressed
+                                                   class="mr-2 mb-2"
+                                                   color="error"
+                                                   @click="dialog = false">
+                                                Закрыть
+                                            </v-btn>
+
+                                            <v-btn depressed
+                                                   class="mb-2"
+                                                   color="success"
+                                                   @click="dialog = false"
+                                                   type="submit">
+                                                Сохранить
+                                            </v-btn>
+                                        </v-col>
+                                    </v-card-actions>
                                 </form>
                             </validation-observer>
                         </v-container>
                         <small>* Поля необходимые для заполнения</small>
                     </v-card-text>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-col>
-                            <v-btn depressed
-                                   class="mr-2 mb-2"
-                                   color="error"
-                                   @click="dialog = false">
-                                Закрыть
-                            </v-btn>
-
-                            <v-btn depressed
-                                   class="mb-2"
-                                   color="success"
-                                   @click="dialog = false"
-                                   type="submit">
-                                Сохранить
-                            </v-btn>
-                        </v-col>
-                    </v-card-actions>
                 </v-card>
             </v-dialog>
         </v-row>
@@ -138,7 +146,6 @@
     export default {
         props: {
             id: {
-                type: Number,
                 required: true
             }
         },
@@ -148,15 +155,15 @@
                 dialog: false,
                 search: "",
                 headers: [],
-                priceList: [],
+                priceListData: [],
                 priceListName: "",
                 priceListDate: null,
                 columns: [],
-                product: {
+                newProduct: {
                     name: "",
                     code: "",
-                },
-                productValue: {}
+                    data: {}
+                }
             }
         },
 
@@ -167,7 +174,7 @@
         methods: {
             loadData() {
                 this.$store.dispatch("getPriceList", this.id).then(({ columns, priceList, productsPriceListData }) => {
-                    this.columns = columns
+                    this.columns = columns;
                     this.priceListName = priceList.name;
                     this.priceListDate = this.formatDate(priceList.creationDate);
 
@@ -175,7 +182,7 @@
                         return {
                             text: c.columnName.name,
                             align: "start",
-                            value: c.columnName.id,
+                            value: c.priceListColumnId,
                         }
                     });
 
@@ -196,6 +203,24 @@
                         },
                         ...headers
                     ];
+
+                    if (productsPriceListData && productsPriceListData.length != 0) {
+                        this.priceListData = productsPriceListData.map((p, index) => {
+                            const product = {
+                                number: index + 1,
+                                name: p.name,
+                                code: p.code
+                            }
+
+                            const columnsData = {};
+
+                            for (const columnData of p.columnsData) {
+                                columnsData[columnData.id] = columnData.value;
+                            }
+
+                            return { ...product, ...columnsData }
+                        })
+                    }
                 })
             },
 
@@ -205,6 +230,35 @@
                 return value != null &&
                     search != null &&
                     value.toString().trim().toLocaleLowerCase().indexOf(search.trim().toLocaleLowerCase()) !== -1;
+            },
+
+            saveNewProduct() {
+                const newProductRequest = {
+                    name: this.newProduct.name,
+                    code: this.newProduct.code
+                };
+
+                this.$store.dispatch("addNewProduct", newProductRequest).then(product => {
+                    const columnsData = [];
+
+                    for (const [priceListColumnId, value] of Object.entries(this.newProduct.data)) {
+                        columnsData.push({
+                            priceListColumnId,
+                            value
+                        });
+                    }
+
+                    const addProductDataToPriceListRequest = {
+                        productId: product.id,
+                        columnsData
+                    };
+
+                    this.$store.dispatch("addDataInPriceList", addProductDataToPriceListRequest).then(_ => {
+                        this.priceListName = "";
+                        this.priceListColumns = [];
+                        this.$refs.observer.reset();
+                    })
+                })
             }
         }
     };

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PriceList.Contracts;
 using PriceList.DataAccess;
-using PriceListData = PriceList.Contracts.PriceListData;
 
 namespace PriceList.BusinessLogic.Handlers;
 
@@ -14,7 +13,7 @@ public class GetPriceListDataHandler : IHandler
         _priceListDbContext = priceListDbContext ?? throw new ArgumentNullException(nameof(priceListDbContext));
     }
 
-    public async Task<PriceListData> HandleAsync(int priceListId)
+    public async Task<PriceListDataDto> HandleAsync(int priceListId)
     {
         var priceList = await _priceListDbContext.PriceLists
             .FirstOrDefaultAsync(pl => pl.Id == priceListId);
@@ -27,6 +26,7 @@ public class GetPriceListDataHandler : IHandler
             .Where(c => c.PriceListId == priceListId)
             .Select(c => new ColumnDescriptionDto
             {
+                PriceListColumnId = c.Id,
                 ColumnName = new ColumnNameDto
                 {
                     Id = c.Column.Id,
@@ -46,7 +46,7 @@ public class GetPriceListDataHandler : IHandler
 
         if (priceListData.Count == 0)
         {
-            return new PriceListData
+            return new PriceListDataDto
             {
                 PriceList = new PriceListDto
                 {
@@ -54,7 +54,8 @@ public class GetPriceListDataHandler : IHandler
                     Name = priceList.Name,
                     CreationDate = priceList.CreationDate
                 },
-                Columns = priceListColumns
+                Columns = priceListColumns,
+                ProductsPriceListData = new List<ProductPriceListData>()
             };
         }
 
@@ -63,7 +64,7 @@ public class GetPriceListDataHandler : IHandler
             .Distinct()
             .ToList();
 
-        var priceListProducts = await _priceListDbContext.Products
+        var priceListProducts = await _priceListDbContext.Product
             .Where(c => priceListProductsIds.Contains(c.Id))
             .Select(c => new ProductDto
             {
@@ -105,9 +106,10 @@ public class GetPriceListDataHandler : IHandler
 
             productPriceListData.ColumnsData = columnsData;
             productsPriceListData.Add(productPriceListData);
+
         }
 
-        return new PriceListData
+        return new PriceListDataDto
         {
             PriceList = new PriceListDto
             {

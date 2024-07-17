@@ -4,16 +4,16 @@ using PriceList.DataAccess.Models;
 
 namespace PriceList.BusinessLogic.Handlers;
 
-public class SavePriceListHandler : IHandler
+public class AddNewPriceListHandler : IHandler
 {
     private readonly PriceListDbContext _priceListDbContext;
 
-    public SavePriceListHandler(PriceListDbContext priceListDbContext)
+    public AddNewPriceListHandler(PriceListDbContext priceListDbContext)
     {
         _priceListDbContext = priceListDbContext ?? throw new ArgumentNullException(nameof(priceListDbContext));
     }
 
-    public async Task<BaseResponse> HandleAsync(CreatePriceListRequest request)
+    public async Task<BaseResponse> HandleAsync(AddNewPriceListRequest request)
     {
         var newRequestedColumns = request.Columns
             .Where(c => c.ColumnName.Id == 0)

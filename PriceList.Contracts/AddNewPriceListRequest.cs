@@ -1,6 +1,6 @@
 ﻿namespace PriceList.Contracts;
 
-public class CreatePriceListRequest
+public class AddNewPriceListRequest
 {
     public string Name { get; set; }
 

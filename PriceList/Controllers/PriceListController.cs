@@ -16,14 +16,14 @@ public class PriceListController : ControllerBase
     }
 
     [HttpGet("{priceListId}")]
-    public Task<PriceListData> GetPriceList([FromServices] GetPriceListDataHandler getPriceListDataHandler, int priceListId)
+    public Task<PriceListDataDto> GetPriceList([FromServices] GetPriceListDataHandler getPriceListDataHandler, int priceListId)
     {
         return getPriceListDataHandler.HandleAsync(priceListId);
     }
 
     [HttpPost]
-    public Task<BaseResponse> SavePriceList([FromServices] SavePriceListHandler savePriceListHandler, CreatePriceListRequest request)
+    public Task<BaseResponse> AddNewPriceList([FromServices] AddNewPriceListHandler addNewPriceListHandler, AddNewPriceListRequest request)
     {
-        return savePriceListHandler.HandleAsync(request);
+        return addNewPriceListHandler.HandleAsync(request);
     }
 }
