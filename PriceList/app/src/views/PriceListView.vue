@@ -86,7 +86,7 @@
                                                                      v-slot="{ errors }"
                                                                      rules="required">
                                                     <v-text-field v-if="column.columnType.id !== 2"
-                                                                  v-model="column.Value"
+                                                                  v-model="productValue[column.columnName.id]"
                                                                   label="Значение"
                                                                   :placeholder="column.columnType.name"
                                                                   :error-messages="errors">
@@ -95,6 +95,7 @@
                                                                 auto-grow
                                                                 outlined
                                                                 rows="3"
+                                                                v-model="productValue[column.columnName.id]"
                                                                 row-height="30"></v-textarea>
                                                 </validation-provider>
                                             </v-col>
@@ -154,8 +155,8 @@
                 product: {
                     name: "",
                     code: "",
-                    columns: []
-                }
+                },
+                productValue: {}
             }
         },
 
@@ -174,7 +175,7 @@
                         return {
                             text: c.columnName.name,
                             align: "start",
-                            value: c.columnName.name,
+                            value: c.columnName.id,
                         }
                     });
 
