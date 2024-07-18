@@ -4,7 +4,7 @@
             this.$router.back();
         } else {
             this.$router.push({
-                name: "portfolioInstruments"
+                name: "priceListsView"
             });
         }
     }

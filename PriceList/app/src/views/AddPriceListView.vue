@@ -5,7 +5,7 @@
         </v-card>
 
         <div>
-            <validation-observer ref="observer" v-slot="{ handleSubmit }">
+            <validation-observer ref="observer" v-slot="{ handleSubmit, invalid }">
                 <form @submit.prevent="handleSubmit(savePricetList)">
                     <v-row>
                         <v-col cols="10">
@@ -71,6 +71,7 @@
                             <v-btn depressed
                                    class="mb-2"
                                    color="success"
+                                   :disabled ="invalid"
                                    type="submit">
                                 Сохранить прайс-лист
                             </v-btn>
@@ -138,8 +139,8 @@
                 }
 
                 this.$store.dispatch("addPriceList", request).then(_ => {
-                    //this.$store.state.connection.invoke("NotifyPriceListCreated", this.priceListName, "admin")
-                    
+                    this.$store.state.connection.invoke("NotifyPriceListCreated", this.priceListName, "admin")
+
                     this.priceListName = "";
                     this.priceListColumns = [];
                     this.$refs.observer.reset();

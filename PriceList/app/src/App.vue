@@ -36,8 +36,8 @@
                    color="primary"
                    dark>
             <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-
-            <v-toolbar-title>База данных прайс-листов</v-toolbar-title>
+            <v-toolbar-title class="mr-10">База данных прайс-листов</v-toolbar-title>
+            <v-btn @click="goBack" outlined >Назад</v-btn>
         </v-app-bar>
 
         <v-main>
@@ -63,6 +63,7 @@
 
 <script>
     import { mapState } from "vuex";
+    import PagesNavigation from "@/common/pagesNavigation";
 
     export default {
         name: "App",
@@ -100,8 +101,7 @@
 
         methods: {
             showNotification(immediately) {
-                const notifications = this.$store.state.toast.notifications;
-                const notification = notifications[notifications.length - 1];
+                const notification = this.notifications[this.notifications.length - 1];
                 this.$store.commit("toast/removeNotification", notification);
 
                 this.snackbarText = notification.text;
@@ -112,7 +112,9 @@
                 } else {
                     this.$nextTick(() => this.showSnackbar = true);
                 }
-            }
+            },
+
+            goBack: PagesNavigation.goBack
         }
     };
 </script>

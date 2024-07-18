@@ -7,10 +7,8 @@ class SignalRConnection {
     constructor() {
         this.delay = 2000;
 
-        const baseUrl = ""; // "https://localhost:44352";
-
         this.connection = new signalR.HubConnectionBuilder()
-            .withUrl(baseUrl + "/hub")
+            .withUrl("/hub")
             .configureLogging(signalR.LogLevel.Information)
             .build();
 

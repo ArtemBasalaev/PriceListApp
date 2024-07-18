@@ -15,7 +15,23 @@ public class AddNewPriceListHandler : IHandler
 
     public async Task<BaseResponse> HandleAsync(AddNewPriceListRequest request)
     {
-        var newRequestedColumns = request.Columns
+        var requestedColumns = new List<ColumnDescriptionDto>
+        {
+            new()
+            {
+                ColumnName = new() { Id = 1 },
+                ColumnType = new() { Id = 1 }
+            },
+            new()
+            {
+                ColumnName = new() { Id = 2 },
+                ColumnType = new() { Id = 1 }
+            }
+        };
+
+        requestedColumns.AddRange(request.Columns);
+
+        var newRequestedColumns = requestedColumns
             .Where(c => c.ColumnName.Id == 0)
             .ToList();
 
@@ -37,9 +53,11 @@ public class AddNewPriceListHandler : IHandler
         };
 
         _priceListDbContext.PriceLists.Add(newPriceList);
+
+        await using var transaction = await _priceListDbContext.Database.BeginTransactionAsync();
         await _priceListDbContext.SaveChangesAsync();
 
-        var priceListColumns = request.Columns
+        var priceListColumns = requestedColumns
             .Select(column => new PriceListColumn
             {
                 PriceListId = newPriceList.Id,
@@ -52,6 +70,7 @@ public class AddNewPriceListHandler : IHandler
 
         _priceListDbContext.PriceListColumns.AddRange(priceListColumns);
         await _priceListDbContext.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         return BaseResponse.GetSuccessResponse("Прайс лист успешно сохранен");
     }

@@ -114,21 +114,32 @@ public class GetPriceListDataHandler : IHandler
                     PriceListColumnId = data.PriceListColumnId,
                 };
 
-                var columnTypeId = data.PriceListColumn.DataTypeId;
-                var type = (DataTypeEnum)columnTypeId;
-
-                switch (type)
+                if (data.PriceListColumn.ColumnId == 1)
                 {
-                    case DataTypeEnum.Text:
-                    case DataTypeEnum.MultiLineText:
-                        productColumnData.Value = textValues.FirstOrDefault(d => d.Id == data.Id)?.Value;
-                        break;
-                    case DataTypeEnum.Integer:
-                        productColumnData.Value = integerValues.FirstOrDefault(d => d.Id == data.Id)?.Value;
-                        break;
-                    case DataTypeEnum.Decimal:
-                        productColumnData.Value = decimalValues.FirstOrDefault(d => d.Id == data.Id)?.Value;
-                        break;
+                    productColumnData.Value = data.Product.Name;
+                }
+                else if (data.PriceListColumn.ColumnId == 2)
+                {
+                    productColumnData.Value = data.Product.Code;
+                }
+                else
+                {
+                    var columnTypeId = data.PriceListColumn.DataTypeId;
+                    var type = (DataTypeEnum)columnTypeId;
+
+                    switch (type)
+                    {
+                        case DataTypeEnum.Text:
+                        case DataTypeEnum.MultiLineText:
+                            productColumnData.Value = textValues.FirstOrDefault(d => d.Id == data.Id)?.Value;
+                            break;
+                        case DataTypeEnum.Integer:
+                            productColumnData.Value = integerValues.FirstOrDefault(d => d.Id == data.Id)?.Value;
+                            break;
+                        case DataTypeEnum.Decimal:
+                            productColumnData.Value = decimalValues.FirstOrDefault(d => d.Id == data.Id)?.Value;
+                            break;
+                    }
                 }
 
                 columnsData.Add(productColumnData);

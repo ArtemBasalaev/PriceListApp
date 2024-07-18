@@ -18,12 +18,14 @@ public class DbInitializer : IDbInitializer
     {
         await _dbContext.Database.MigrateAsync();
 
-        if (_dbContext.DataTypes.Any())
+        if (_dbContext.DataTypes.Any() && _dbContext.Columns.Any())
         {
             return;
         }
 
-        var dataTypes = new List<DataType>
+        if (!_dbContext.DataTypes.Any())
+        {
+            var dataTypes = new List<DataType>
         {
             new()
             {
@@ -47,7 +49,26 @@ public class DbInitializer : IDbInitializer
             }
         };
 
-        _dbContext.DataTypes.AddRange(dataTypes);
+            _dbContext.DataTypes.AddRange(dataTypes);
+        }
+
+        if (!_dbContext.Columns.Any())
+        {
+            var columns = new List<Column>
+            {
+                new()
+                {
+                    Name = "Название"
+                },
+                new()
+                {
+                    Name = "Код"
+                }
+            };
+
+            _dbContext.Columns.AddRange(columns);
+        }
+
         await _dbContext.SaveChangesAsync();
     }
 }

@@ -81,70 +81,70 @@
 
                         <v-card-text>
                             <v-container>
-                                <validation-observer ref="observer" v-slot="{ handleSubmit, errors }">
+                                <validation-observer ref="observer" v-slot="{ handleSubmit, invalid }">
                                     <form @submit.prevent="handleSubmit(saveNewProduct)">
-                                        <v-row>
-                                            <v-col cols="12">
-                                                <validation-provider tag="div"
-                                                                     v-slot="{ errors }"
-                                                                     rules="required">
-                                                    <v-text-field v-model="newProduct.name"
-                                                                  label="Название товара*"
-                                                                  :error-messages="errors">
-                                                    </v-text-field>
-                                                </validation-provider>
-                                            </v-col>
-
-                                            <v-col cols="12">
-                                                <validation-provider tag="div"
-                                                                     v-slot="{ errors }"
-                                                                     rules="required">
-                                                    <v-text-field v-model="newProduct.code"
-                                                                  label="Код товара"
-                                                                  :error-messages="errors">
-                                                    </v-text-field>
-                                                </validation-provider>
-                                            </v-col>
-                                        </v-row>
-
                                         <template v-for="(column, i) in columns">
                                             <v-row align="center" :key="i">
-                                                <v-col cols="12" sm="3" class="py-0">
-                                                    <div class="text-body-1 font-weight-bold">{{ column.columnName.name }}</div>
+                                                <v-col cols="12" v-if="column.columnName.id === 1">
+                                                    <validation-provider tag="div"
+                                                                         v-slot="{ errors }"
+                                                                         rules="required">
+                                                        <v-text-field v-model="newProduct.name"
+                                                                      label="Название товара*"
+                                                                      :error-messages="errors">
+                                                        </v-text-field>
+                                                    </validation-provider>
                                                 </v-col>
 
-                                                <v-col cols="12" sm="9" class="py-0">
-                                                    <validation-provider v-if="column.columnType.id === 1"
-                                                                         tag="div"
+                                                <v-col cols="12" v-else-if="column.columnName.id === 2">
+                                                    <validation-provider tag="div"
                                                                          v-slot="{ errors }"
                                                                          rules="required">
-                                                        <v-text-field v-model="newProduct.data[column.priceListColumnId]"
-                                                                      label="Текст"
-                                                                      :placeholder="column.columnType.name"
-                                                                      :error-messages="errors">
-                                                        </v-text-field>
-                                                    </validation-provider>
-                                                    <validation-provider v-else-if="column.columnType.id === 2"
-                                                                         tag="div"
-                                                                         v-slot="{ errors }"
-                                                                         rules="required">
-                                                        <v-textarea auto-grow
-                                                                    outlined
-                                                                    rows="3"
-                                                                    v-model="newProduct.data[column.priceListColumnId]"
-                                                                    row-height="30"></v-textarea>
-                                                    </validation-provider>
-                                                    <validation-provider v-else
-                                                                         tag="div"
-                                                                         v-slot="{ errors }"
-                                                                         rules="required|numeric">
-                                                        <v-text-field v-model.number="newProduct.data[column.priceListColumnId]"
-                                                                      label="Число"
-                                                                      :placeholder="column.columnType.name"
+                                                        <v-text-field v-model="newProduct.code"
+                                                                      label="Код товара*"
                                                                       :error-messages="errors">
                                                         </v-text-field>
                                                     </validation-provider>
                                                 </v-col>
+
+                                                <template v-else>
+                                                    <v-col cols="12" sm="3" class="py-0">
+                                                        <div class="text-body-1 font-weight-bold">{{ column.columnName.name }}*</div>
+                                                    </v-col>
+
+                                                    <v-col cols="12" sm="9" class="py-0">
+                                                        <validation-provider v-if="column.columnType.id === 1"
+                                                                             tag="div"
+                                                                             v-slot="{ errors }"
+                                                                             rules="required">
+                                                            <v-text-field v-model="newProduct.data[column.priceListColumnId]"
+                                                                          label="Текст"
+                                                                          :placeholder="column.columnType.name"
+                                                                          :error-messages="errors">
+                                                            </v-text-field>
+                                                        </validation-provider>
+                                                        <validation-provider v-else-if="column.columnType.id === 2"
+                                                                             tag="div"
+                                                                             v-slot="{ errors }"
+                                                                             rules="required">
+                                                            <v-textarea auto-grow
+                                                                        outlined
+                                                                        rows="3"
+                                                                        v-model="newProduct.data[column.priceListColumnId]"
+                                                                        row-height="30"></v-textarea>
+                                                        </validation-provider>
+                                                        <validation-provider v-else
+                                                                             tag="div"
+                                                                             v-slot="{ errors }"
+                                                                             rules="required|numeric">
+                                                            <v-text-field v-model.number="newProduct.data[column.priceListColumnId]"
+                                                                          label="Число"
+                                                                          :placeholder="column.columnType.name"
+                                                                          :error-messages="errors">
+                                                            </v-text-field>
+                                                        </validation-provider>
+                                                    </v-col>
+                                                </template>
                                             </v-row>
                                         </template>
 
@@ -162,7 +162,7 @@
                                                        class="mb-2"
                                                        color="success"
                                                        @click="dialog = false"
-                                                       :disabled ="Object.entries(errors).some(err => err[1].length !== 0)"
+                                                       :disabled="invalid"
                                                        type="submit">
                                                     Сохранить
                                                 </v-btn>
@@ -224,11 +224,11 @@
                     this.priceListName = priceList.name;
                     this.priceListDate = this.formatDate(priceList.creationDate);
 
-                    const headers = columns.map((c, index) => {
+                    const headers = columns.map(c => {
                         return {
                             text: c.columnName.name,
                             align: "start",
-                            value: `p.${index + 1}_` + c.priceListColumnId
+                            value: "p." + c.priceListColumnId
                         };
                     });
 
@@ -236,46 +236,32 @@
                         {
                             text: "Номер",
                             value: "number",
-                        },
-                        {
-                            text: "Название",
                             align: "start",
-                            value: "productName",
-                        },
-                        {
-                            text: "Код",
-                            align: "start",
-                            value: "productCode",
+                            width: "5%"
                         },
                         ...headers,
                         {
                             text: "Удалить",
                             value: "actions",
-                            sortable: false
+                            sortable: false,
+                            width: "5%",
+                            align: "end"
                         }
                     ];
 
                     if (productsPriceListData && productsPriceListData.length != 0) {
                         this.priceListData = productsPriceListData.map((p, index) => {
-                            const product = {
-                                number: index + 1,
-                                productName: p.product.name,
-                                product: p.product.code
-                            }
-
                             const data = {
+                                number: index + 1,
                                 recordIds: []
                             };
 
-                            let i = 1;
-
                             for (const columnData of p.columnsData) {
                                 data.recordIds.push(columnData.id);
-                                data[`p.${i}_` + columnData.priceListColumnId] = columnData.value;
-                                i++;
+                                data["p." + columnData.priceListColumnId] = columnData.value;
                             }
 
-                            return { ...product, ...data };
+                            return data;
                         });
                     }
 
@@ -330,7 +316,20 @@
                 };
 
                 this.$store.dispatch("addNewProduct", newProductRequest).then(product => {
-                    const columnsData = [];
+                    let columnsData = [];
+
+                    if (this.columns.length > 1) {
+                        columnsData = [
+                            {
+                                priceListColumnId: this.columns[0].priceListColumnId,
+                                value: null
+                            },
+                            {
+                                priceListColumnId: this.columns[1].priceListColumnId,
+                                value: null
+                            }
+                        ];
+                    }
 
                     for (const [priceListColumnId, value] of Object.entries(this.newProduct.data)) {
                         columnsData.push({
@@ -345,10 +344,14 @@
                     };
 
                     this.$store.dispatch("addDataInPriceList", addProductDataToPriceListRequest).then(_ => {
-                        this.newProduct = {};
+                        this.newProduct = {
+                            name: "",
+                            code: "",
+                            data: {}
+                        };
+
                         this.loadData();
                         this.isLoading = false;
-
                     })
                 })
             }

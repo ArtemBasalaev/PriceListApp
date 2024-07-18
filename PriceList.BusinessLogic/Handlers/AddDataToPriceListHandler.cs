@@ -37,7 +37,7 @@ public class AddDataToPriceListHandler : IHandler
                 RecordDate = DateTime.Now
             })
             .ToList();
-
+        
         await using var transaction = await _priceListDbContext.Database.BeginTransactionAsync();
 
         _priceListDbContext.PriceListData.AddRange(newRecords);
@@ -62,6 +62,11 @@ public class AddDataToPriceListHandler : IHandler
 
         for (var i = 0; i < newRecords.Count; i++)
         {
+            if (productData[i].Value == null)
+            {
+                continue;
+            }
+
             var priceListColumnId = newRecords[i].PriceListColumnId;
 
             if (!columnTypes.ContainsKey(priceListColumnId) && productData[i].Value is not JsonElement)

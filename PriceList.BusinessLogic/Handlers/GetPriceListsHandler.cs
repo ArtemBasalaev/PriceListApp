@@ -22,6 +22,7 @@ public class GetPriceListsHandler : IHandler
                 Name = c.Name,
                 CreationDate = c.CreationDate
             })
+            .OrderByDescending(p => p.CreationDate)
             .ToListAsync();
     }
 }
