@@ -46,7 +46,7 @@
             </v-container>
         </v-main>
 
-        <v-content>
+        <v-main>
             <v-snackbar :color="snackbarColor" :multi-line="snackbarText.length > 58" v-model="showSnackbar" top right>
                 <div class="d-flex align-center">
                     <span>{{ snackbarText }}</span>
@@ -57,7 +57,7 @@
                            @click="showSnackbar = false">Закрыть</v-btn>
                 </div>
             </v-snackbar>
-        </v-content>
+        </v-main>
     </v-app>
 </template>
 

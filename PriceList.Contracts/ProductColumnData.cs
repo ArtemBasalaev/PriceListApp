@@ -4,9 +4,7 @@ public class ProductColumnData
 {
     public int Id { get; set; }
 
-    public int ColumnTypeId { get; set; }
-
-    public int ColumnNameId { get; set; }
+    public int PriceListColumnId { get; set; }
 
     public object? Value { get; set; }
 }

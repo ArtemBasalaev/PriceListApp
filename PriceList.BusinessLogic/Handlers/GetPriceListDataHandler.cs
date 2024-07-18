@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using PriceList.Contracts;
 using PriceList.DataAccess;
-using System;
 
 namespace PriceList.BusinessLogic.Handlers;
 
@@ -77,8 +75,8 @@ public class GetPriceListDataHandler : IHandler
             })
             .ToListAsync();
 
-        var recordsIds = priceListColumns
-            .Select(c => c.PriceListColumnId)
+        var recordsIds = priceListData
+            .Select(c => c.Id)
             .ToList();
 
         var textValues = await _priceListDbContext.TextColumnsData
@@ -110,15 +108,14 @@ public class GetPriceListDataHandler : IHandler
 
             foreach (var data in productData)
             {
-                var columnTypeId = data.PriceListColumn.DataTypeId;
-                var type = (DataTypeEnum)columnTypeId;
-
                 var productColumnData = new ProductColumnData
                 {
                     Id = data.Id,
-                    ColumnTypeId = columnTypeId,
-                    ColumnNameId = data.PriceListColumn.ColumnId
+                    PriceListColumnId = data.PriceListColumnId,
                 };
+
+                var columnTypeId = data.PriceListColumn.DataTypeId;
+                var type = (DataTypeEnum)columnTypeId;
 
                 switch (type)
                 {
@@ -139,7 +136,6 @@ public class GetPriceListDataHandler : IHandler
 
             productPriceListData.ColumnsData = columnsData;
             productsPriceListData.Add(productPriceListData);
-
         }
 
         return new PriceListDataDto
