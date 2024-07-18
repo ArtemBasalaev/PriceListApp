@@ -8,5 +8,5 @@ public class ProductColumnData
 
     public int ColumnNameId { get; set; }
 
-    public object Value { get; set; }
+    public object? Value { get; set; }
 }

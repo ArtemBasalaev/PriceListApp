@@ -33,6 +33,8 @@ public class PriceListDbContext : DbContext
 
         modelBuilder.Entity<DataType>(b =>
         {
+            b.Property(dt => dt.Id).ValueGeneratedNever();
+
             b.Property(dt => dt.TypeName)
                 .IsRequired()
                 .HasMaxLength(20);

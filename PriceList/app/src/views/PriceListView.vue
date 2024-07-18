@@ -87,20 +87,19 @@
                                                                      rules="required">
                                                     <v-text-field v-if="column.columnType.id === 1"
                                                                   v-model="newProduct.data[column.priceListColumnId]"
-                                                                  label="Значение"
+                                                                  label="Текст"
                                                                   :placeholder="column.columnType.name"
                                                                   :error-messages="errors">
                                                     </v-text-field>
-                                                    <v-textarea v-else-if="2"
+                                                    <v-textarea v-else-if="column.columnType.id === 2"
                                                                 auto-grow
                                                                 outlined
                                                                 rows="3"
                                                                 v-model="newProduct.data[column.priceListColumnId]"
                                                                 row-height="30"></v-textarea>
                                                     <v-text-field v-else
-                                                                  v-model="newProduct.data[column.priceListColumnId]"
-                                                                  label="Значение"
-                                                                  type="number"
+                                                                  v-model.number="newProduct.data[column.priceListColumnId]"
+                                                                  label="Число"
                                                                   :placeholder="column.columnType.name"
                                                                   :error-messages="errors">
                                                     </v-text-field>

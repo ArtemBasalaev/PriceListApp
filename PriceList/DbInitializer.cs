@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PriceList.Contracts;
 using PriceList.DataAccess;
 using PriceList.DataAccess.Models;
 
@@ -26,18 +27,22 @@ public class DbInitializer : IDbInitializer
         {
             new()
             {
+                Id = (int)DataTypeEnum.Text,
                 TypeName = "Однострочный текст"
             },
             new()
             {
+                Id = (int)DataTypeEnum.MultiLineText,
                 TypeName = "Многострочный текст"
             },
             new()
             {
+                Id = (int)DataTypeEnum.Integer,
                 TypeName = "Целое число"
             },
             new()
             {
+                Id = (int)DataTypeEnum.Decimal,
                 TypeName = "Десятичное число"
             }
         };

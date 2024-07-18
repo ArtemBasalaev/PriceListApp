@@ -1,14 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using PriceList.Contracts;
 using PriceList.DataAccess;
 using PriceList.DataAccess.Models;
-using DataType = PriceList.Contracts.DataType;
+using DataTypeEnum = PriceList.Contracts.DataTypeEnum;
 
 namespace PriceList.BusinessLogic.Handlers;
 
 public class AddDataInPriceList : IHandler
 {
     private readonly PriceListDbContext _priceListDbContext;
+
+    private readonly Dictionary<DataTypeEnum, JsonValueKind> _dataTypes = new()
+    {
+        [DataTypeEnum.Text] = JsonValueKind.String,
+        [DataTypeEnum.MultiLineText] = JsonValueKind.String,
+        [DataTypeEnum.Integer] = JsonValueKind.Number,
+        [DataTypeEnum.Decimal] = JsonValueKind.Number
+    };
 
     public AddDataInPriceList(PriceListDbContext priceListDbContext)
     {
@@ -28,6 +37,8 @@ public class AddDataInPriceList : IHandler
                 RecordDate = DateTime.Now
             })
             .ToList();
+
+        await using var transaction = await _priceListDbContext.Database.BeginTransactionAsync();
 
         _priceListDbContext.PriceListData.AddRange(newRecords);
         await _priceListDbContext.SaveChangesAsync();
@@ -53,38 +64,41 @@ public class AddDataInPriceList : IHandler
         {
             var priceListColumnId = newRecords[i].PriceListColumnId;
 
-            if (!columnTypes.ContainsKey(priceListColumnId))
+            if (!columnTypes.ContainsKey(priceListColumnId) && productData[i].Value is not JsonElement)
             {
                 throw new Exception("Ошибка при вставке данных");
             }
 
-            var dataType = (DataType)columnTypes[priceListColumnId];
-
+            var value = (JsonElement)productData[i].Value;
+            var dataType = (DataTypeEnum)columnTypes[priceListColumnId];
             var dataRecordId = newRecords[i].Id;
-            
-            if (dataType is DataType.Text or DataType.MultiLineText && productData[i].Value is string textValue)
+
+            if (_dataTypes[dataType] == JsonValueKind.String)
             {
                 textValues.Add(new TextColumnData
                 {
                     Id = dataRecordId,
-                    Value = textValue
+                    Value = value.GetString()
                 });
             }
-            else if (dataType == DataType.Integer && productData[i].Value is int integerValue)
+            else if (_dataTypes[dataType] == JsonValueKind.Number)
             {
-                integerValues.Add(new IntegerColumnData
+                if (dataType == DataTypeEnum.Integer)
                 {
-                    Id = dataRecordId,
-                    Value = integerValue
-                });
-            }
-            else if (dataType == DataType.Decimal && productData[i].Value is decimal decimalValue)
-            {
-                decimalValues.Add(new DecimalColumnData
+                    integerValues.Add(new IntegerColumnData
+                    {
+                        Id = dataRecordId,
+                        Value = value.GetInt32()
+                    });
+                }
+                else if (dataType == DataTypeEnum.Decimal)
                 {
-                    Id = dataRecordId,
-                    Value = decimalValue
-                });
+                    decimalValues.Add(new DecimalColumnData
+                    {
+                        Id = dataRecordId,
+                        Value = value.GetDecimal()
+                    });
+                }
             }
             else
             {
@@ -95,6 +109,9 @@ public class AddDataInPriceList : IHandler
         _priceListDbContext.TextColumnsData.AddRange(textValues);
         _priceListDbContext.IntegerColumnData.AddRange(integerValues);
         _priceListDbContext.DecimalColumnData.AddRange(decimalValues);
+
+        await _priceListDbContext.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         return BaseResponse.GetSuccessResponse("Данные успешно сохранены");
     }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using PriceList.Contracts;
 using PriceList.DataAccess;
+using System;
 
 namespace PriceList.BusinessLogic.Handlers;
 
@@ -22,6 +24,7 @@ public class GetPriceListDataHandler : IHandler
         {
             throw new Exception("Прайс-лист не найден");
         }
+
         var priceListColumns = await _priceListDbContext.PriceListColumns
             .Where(c => c.PriceListId == priceListId)
             .Select(c => new ColumnDescriptionDto
@@ -59,13 +62,13 @@ public class GetPriceListDataHandler : IHandler
             };
         }
 
-        var priceListProductsIds = priceListData
+        var productsIds = priceListData
             .Select(c => c.ProductId)
             .Distinct()
             .ToList();
 
-        var priceListProducts = await _priceListDbContext.Product
-            .Where(c => priceListProductsIds.Contains(c.Id))
+        var products = await _priceListDbContext.Product
+            .Where(c => productsIds.Contains(c.Id))
             .Select(c => new ProductDto
             {
                 Id = c.Id,
@@ -74,32 +77,62 @@ public class GetPriceListDataHandler : IHandler
             })
             .ToListAsync();
 
+        var recordsIds = priceListColumns
+            .Select(c => c.PriceListColumnId)
+            .ToList();
+
+        var textValues = await _priceListDbContext.TextColumnsData
+            .Where(v => recordsIds.Contains(v.Id))
+            .ToListAsync();
+
+        var integerValues = await _priceListDbContext.IntegerColumnData
+            .Where(v => recordsIds.Contains(v.Id))
+            .ToListAsync();
+
+        var decimalValues = await _priceListDbContext.DecimalColumnData
+            .Where(v => recordsIds.Contains(v.Id))
+            .ToListAsync();
+
         var productsPriceListData = new List<ProductPriceListData>();
 
-        foreach (var product in priceListProducts)
+        foreach (var product in products)
         {
             var productPriceListData = new ProductPriceListData
             {
                 Product = product
             };
 
-            var productColumnsData = priceListData
+            var productData = priceListData
                 .Where(p => p.ProductId == product.Id)
                 .ToList();
 
             var columnsData = new List<ProductColumnData>();
 
-            foreach (var columnData in productColumnsData)
+            foreach (var data in productData)
             {
-                var columnTypeId = columnData.PriceListColumn.DataTypeId;
+                var columnTypeId = data.PriceListColumn.DataTypeId;
+                var type = (DataTypeEnum)columnTypeId;
 
                 var productColumnData = new ProductColumnData
                 {
-                    Id = columnData.Id,
+                    Id = data.Id,
                     ColumnTypeId = columnTypeId,
-                    ColumnNameId = columnData.PriceListColumn.ColumnId,
-                    Value = GetValueAsync(columnTypeId, columnData.Id)
+                    ColumnNameId = data.PriceListColumn.ColumnId
                 };
+
+                switch (type)
+                {
+                    case DataTypeEnum.Text:
+                    case DataTypeEnum.MultiLineText:
+                        productColumnData.Value = textValues.FirstOrDefault(d => d.Id == data.Id)?.Value;
+                        break;
+                    case DataTypeEnum.Integer:
+                        productColumnData.Value = integerValues.FirstOrDefault(d => d.Id == data.Id)?.Value;
+                        break;
+                    case DataTypeEnum.Decimal:
+                        productColumnData.Value = decimalValues.FirstOrDefault(d => d.Id == data.Id)?.Value;
+                        break;
+                }
 
                 columnsData.Add(productColumnData);
             }
@@ -120,45 +153,5 @@ public class GetPriceListDataHandler : IHandler
             Columns = priceListColumns,
             ProductsPriceListData = productsPriceListData
         };
-    }
-
-    private async Task<object?> GetValueAsync(int typeId, int columnDataId)
-    {
-        var type = (DataType)typeId;
-
-        if (type == DataType.Text || type == DataType.MultiLineText)
-        {
-            var data = await _priceListDbContext.TextColumnsData
-                .FirstOrDefaultAsync(d => d.Id == columnDataId);
-
-            if (data != null)
-            {
-                return data.Value;
-            }
-        }
-
-        if (type == DataType.Integer)
-        {
-            var data = await _priceListDbContext.IntegerColumnData
-                .FirstOrDefaultAsync(d => d.Id == columnDataId);
-
-            if (data != null)
-            {
-                return data.Value;
-            }
-        }
-
-        if (type == DataType.Decimal)
-        {
-            var data = await _priceListDbContext.DecimalColumnData
-                .FirstOrDefaultAsync(d => d.Id == columnDataId);
-
-            if (data != null)
-            {
-                return data.Value;
-            }
-        }
-
-        return default;
     }
 }

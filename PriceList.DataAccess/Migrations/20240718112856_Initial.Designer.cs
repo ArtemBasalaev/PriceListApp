@@ -12,7 +12,7 @@ using PriceList.DataAccess;
 namespace PriceList.DataAccess.Migrations
 {
     [DbContext(typeof(PriceListDbContext))]
-    [Migration("20240715174011_Initial")]
+    [Migration("20240718112856_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -49,10 +49,7 @@ namespace PriceList.DataAccess.Migrations
             modelBuilder.Entity("PriceList.DataAccess.Models.DataType", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("TypeName")
                         .IsRequired()
@@ -200,7 +197,7 @@ namespace PriceList.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TextColumnData");
+                    b.ToTable("TextColumnsData");
                 });
 
             modelBuilder.Entity("PriceList.DataAccess.Models.DecimalColumnData", b =>

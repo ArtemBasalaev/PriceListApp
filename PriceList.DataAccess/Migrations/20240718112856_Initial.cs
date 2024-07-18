@@ -28,8 +28,7 @@ namespace PriceList.DataAccess.Migrations
                 name: "DataTypes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     TypeName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
@@ -162,7 +161,7 @@ namespace PriceList.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TextColumnData",
+                name: "TextColumnsData",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
@@ -170,9 +169,9 @@ namespace PriceList.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TextColumnData", x => x.Id);
+                    table.PrimaryKey("PK_TextColumnsData", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TextColumnData_PriceListData_Id",
+                        name: "FK_TextColumnsData_PriceListData_Id",
                         column: x => x.Id,
                         principalTable: "PriceListData",
                         principalColumn: "Id",
@@ -215,7 +214,7 @@ namespace PriceList.DataAccess.Migrations
                 name: "IntegerColumnData");
 
             migrationBuilder.DropTable(
-                name: "TextColumnData");
+                name: "TextColumnsData");
 
             migrationBuilder.DropTable(
                 name: "PriceListData");

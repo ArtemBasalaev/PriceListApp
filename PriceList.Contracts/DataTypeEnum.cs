@@ -1,6 +1,6 @@
 ﻿namespace PriceList.Contracts;
 
-public enum DataType
+public enum DataTypeEnum
 {
    Text = 1,
 

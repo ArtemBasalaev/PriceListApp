@@ -46,10 +46,7 @@ namespace PriceList.DataAccess.Migrations
             modelBuilder.Entity("PriceList.DataAccess.Models.DataType", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("TypeName")
                         .IsRequired()
@@ -197,7 +194,7 @@ namespace PriceList.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TextColumnData");
+                    b.ToTable("TextColumnsData");
                 });
 
             modelBuilder.Entity("PriceList.DataAccess.Models.DecimalColumnData", b =>
