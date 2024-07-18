@@ -81,7 +81,7 @@
 
                         <v-card-text>
                             <v-container>
-                                <validation-observer ref="observer" v-slot="{ handleSubmit }">
+                                <validation-observer ref="observer" v-slot="{ handleSubmit, errors }">
                                     <form @submit.prevent="handleSubmit(saveNewProduct)">
                                         <v-row>
                                             <v-col cols="12">
@@ -114,23 +114,31 @@
                                                 </v-col>
 
                                                 <v-col cols="12" sm="9" class="py-0">
-                                                    <validation-provider tag="div"
+                                                    <validation-provider v-if="column.columnType.id === 1"
+                                                                         tag="div"
                                                                          v-slot="{ errors }"
                                                                          rules="required">
-                                                        <v-text-field v-if="column.columnType.id === 1"
-                                                                      v-model="newProduct.data[column.priceListColumnId]"
+                                                        <v-text-field v-model="newProduct.data[column.priceListColumnId]"
                                                                       label="Текст"
                                                                       :placeholder="column.columnType.name"
                                                                       :error-messages="errors">
                                                         </v-text-field>
-                                                        <v-textarea v-else-if="column.columnType.id === 2"
-                                                                    auto-grow
+                                                    </validation-provider>
+                                                    <validation-provider v-else-if="column.columnType.id === 2"
+                                                                         tag="div"
+                                                                         v-slot="{ errors }"
+                                                                         rules="required">
+                                                        <v-textarea auto-grow
                                                                     outlined
                                                                     rows="3"
                                                                     v-model="newProduct.data[column.priceListColumnId]"
                                                                     row-height="30"></v-textarea>
-                                                        <v-text-field v-else
-                                                                      v-model.number="newProduct.data[column.priceListColumnId]"
+                                                    </validation-provider>
+                                                    <validation-provider v-else
+                                                                         tag="div"
+                                                                         v-slot="{ errors }"
+                                                                         rules="required|numeric">
+                                                        <v-text-field v-model.number="newProduct.data[column.priceListColumnId]"
                                                                       label="Число"
                                                                       :placeholder="column.columnType.name"
                                                                       :error-messages="errors">
@@ -146,7 +154,7 @@
                                                 <v-btn depressed
                                                        class="mr-2 mb-2"
                                                        color="error"
-                                                       @click="dialog = false">
+                                                       @click="closeDeleteDialog">
                                                     Закрыть
                                                 </v-btn>
 
@@ -154,6 +162,7 @@
                                                        class="mb-2"
                                                        color="success"
                                                        @click="dialog = false"
+                                                       :disabled ="Object.entries(errors).some(err => err[1].length !== 0)"
                                                        type="submit">
                                                     Сохранить
                                                 </v-btn>
@@ -282,6 +291,18 @@
                     value.toString().trim().toLocaleLowerCase().indexOf(search.trim().toLocaleLowerCase()) !== -1;
             },
 
+            closeDeleteDialog() {
+                this.dialog = false;
+
+                this.newProduct = {
+                    name: "",
+                    code: "",
+                    data: {}
+                };
+
+                this.$refs.observer.reset();
+            },
+
             openDeleteDialog(item) {
                 this.dataToDelete = item;
                 this.dialogDelete = true;
@@ -296,6 +317,7 @@
                 this.$store.dispatch("deleteProduct", recordIds).then(_ => {
                     this.priceListData.splice(index, 1);
                     this.dataToDelete = null;
+                    this.$store.commit("toast/success", "Товар успешно удален");
                 });
             },
 
@@ -326,6 +348,7 @@
                         this.newProduct = {};
                         this.loadData();
                         this.isLoading = false;
+
                     })
                 })
             }

@@ -12,7 +12,7 @@ configure({
     useConstraintAttrs: false
 });
 
-import { required, numeric, min, max, length, email, alpha, alpha_dash, confirmed, is, is_not, regex } from "vee-validate/dist/rules.umd";
+import { required, numeric } from "vee-validate/dist/rules.umd";
 import ru from "vee-validate/dist/locale/ru.json";
 
 Vue.component("ValidationProvider", ValidationProvider);
@@ -25,24 +25,9 @@ extend("required", {
     message: "поле обязательно для заполнения"
 });
 
-extend("numeric", numeric);
-extend("min", min);
-extend("max", max);
-extend("length", length);
-extend("email", email);
-extend("alpha", alpha);
-extend("alpha_dash", alpha_dash);
-extend("confirmed", confirmed);
-extend("is", is);
-extend("is_not", is_not);
-extend("regex", regex);
-
-extend("confirmedBy", {
-    params: ["target"],
-    validate(value, { target }) {
-        return value === target;
-    },
-    message: "{_field_} не совпадает с {target}"
+extend("numeric", {
+    ...numeric,
+    message: "значение должно быть числом"
 });
 
 import axios from "axios";

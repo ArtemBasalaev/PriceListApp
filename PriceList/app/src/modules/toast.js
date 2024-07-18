@@ -14,15 +14,6 @@
         },
 
         error(state, error) {
-            if (!error) {
-                state.notifications.push({
-                    text: "Неизвестная ошибка",
-                    type: "error"
-                });
-
-                return;
-            }
-
             if (typeof error === "string") {
                 state.notifications.push({
                     text: error,
@@ -39,10 +30,6 @@
                     message = error.response.data.message;
                 } else if (error.message && typeof error.message === "string") {
                     message = error.message;
-                }
-
-                if (message === "Network Error") {
-                    message = "Ошибка сети";
                 }
 
                 state.notifications.push({
