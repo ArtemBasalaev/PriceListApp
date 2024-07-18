@@ -14,10 +14,6 @@ const store = new Vuex.Store({
         connection: SignalR.connection,
     },
 
-    getters: {
-
-    },
-
     mutations: {
         setPriceListsColumns(state, priceListsColumns) {
             state.priceListsColumns = priceListsColumns;
@@ -52,6 +48,14 @@ const store = new Vuex.Store({
         getPriceList({ state }, id) {
             return state.priceListService.getPriceList(id);
         },
+
+        deleteProduct({ state }, ids) {
+            const request = {
+                data: ids
+            };
+
+            return state.priceListService.deleteProduct(request);
+        }
     },
 
     modules: {
@@ -59,6 +63,6 @@ const store = new Vuex.Store({
     }
 });
 
-//SubscribeSignalREvents(SignalR, store);
+SubscribeSignalREvents(SignalR, store);
 
 export default store;

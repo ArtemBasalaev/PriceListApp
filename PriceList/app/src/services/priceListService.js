@@ -33,7 +33,7 @@ export default class Service {
         return axios.post(this.url + "Product", request);
     }
 
-    deleteProduct(productId) {
-        return axios.post(this.url + "Product", productId);
+    deleteProduct(request) {
+        return axios.delete(this.url + "PriceData", request);
     }
 }

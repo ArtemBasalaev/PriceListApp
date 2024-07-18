@@ -10,8 +10,14 @@ namespace PriceList.Controllers;
 public class PriceDataController
 {
     [HttpPost]
-    public Task<BaseResponse> AddDataInPriceList([FromServices] AddDataInPriceList addDataInPriceList, AddNewDataToPriceListRequest request)
+    public Task<BaseResponse> AddDataToPriceList([FromServices] AddDataToPriceListHandler addDataToPriceListHandler, AddNewDataToPriceListRequest request)
     {
-        return addDataInPriceList.HandleAsync(request);
+        return addDataToPriceListHandler.HandleAsync(request);
+    }
+
+    [HttpDelete]
+    public Task<BaseResponse> DeleteDataFromPriceList([FromServices] DeleteDataFromPriceListHandler deleteDataFromPriceListHandler, int[] ids)
+    {
+        return deleteDataFromPriceListHandler.HandleAsync(ids);
     }
 }

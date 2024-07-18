@@ -45,7 +45,7 @@
 
                         <template v-slot:item.actions="{ item }">
                             <v-icon small
-                                    @click="dialogDelete = true">
+                                    @click="openDeleteDialog(item)">
                                 mdi-delete
                             </v-icon>
                         </template>
@@ -193,6 +193,7 @@
                 priceListName: "",
                 priceListDate: null,
                 columns: [],
+                dataToDelete: {},
                 newProduct: {
                     name: "",
                     code: "",
@@ -218,8 +219,8 @@
                         return {
                             text: c.columnName.name,
                             align: "start",
-                            value: `p.${index + 1}_` + c.priceListColumnId,
-                        }
+                            value: `p.${index + 1}_` + c.priceListColumnId
+                        };
                     });
 
                     this.headers = [
@@ -253,11 +254,14 @@
                                 product: p.product.code
                             }
 
-                            const data = {};
+                            const data = {
+                                recordIds: []
+                            };
 
                             let i = 1;
 
                             for (const columnData of p.columnsData) {
+                                data.recordIds.push(columnData.id);
                                 data[`p.${i}_` + columnData.priceListColumnId] = columnData.value;
                                 i++;
                             }
@@ -278,9 +282,21 @@
                     value.toString().trim().toLocaleLowerCase().indexOf(search.trim().toLocaleLowerCase()) !== -1;
             },
 
-            deleteProduct(item) {
+            openDeleteDialog(item) {
+                this.dataToDelete = item;
+                this.dialogDelete = true;
+            },
+
+            deleteProduct() {
                 this.dialogDelete = false;
 
+                const index = this.priceListData.indexOf(this.dataToDelete);
+                const recordIds = this.priceListData[index].recordIds;
+
+                this.$store.dispatch("deleteProduct", recordIds).then(_ => {
+                    this.priceListData.splice(index, 1);
+                    this.dataToDelete = null;
+                });
             },
 
             saveNewProduct() {

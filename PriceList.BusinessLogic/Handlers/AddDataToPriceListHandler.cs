@@ -7,7 +7,7 @@ using DataTypeEnum = PriceList.Contracts.DataTypeEnum;
 
 namespace PriceList.BusinessLogic.Handlers;
 
-public class AddDataInPriceList : IHandler
+public class AddDataToPriceListHandler : IHandler
 {
     private readonly PriceListDbContext _priceListDbContext;
 
@@ -19,7 +19,7 @@ public class AddDataInPriceList : IHandler
         [DataTypeEnum.Decimal] = JsonValueKind.Number
     };
 
-    public AddDataInPriceList(PriceListDbContext priceListDbContext)
+    public AddDataToPriceListHandler(PriceListDbContext priceListDbContext)
     {
         _priceListDbContext = priceListDbContext ?? throw new ArgumentNullException(nameof(priceListDbContext));
     }
