@@ -13,7 +13,8 @@ public class GetPriceListsHandler : IHandler
         _priceListDbContext = priceListDbContext ?? throw new ArgumentNullException(nameof(priceListDbContext));
     }
 
-    public Task<List<PriceListDto>> HandleAsync()
+    // virtual для Mock тестирования
+    public virtual Task<List<PriceListDto>> HandleAsync()
     {
         return _priceListDbContext.PriceLists
             .Select(c => new PriceListDto
